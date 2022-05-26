@@ -1,70 +1,40 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- *
- * @format
- * @flow strict-local
- */
+import React from 'react';
+import {NavigationContainer} from '@react-navigation/native';
+import {createNativeStackNavigator} from '@react-navigation/native-stack';
+import {UserContextProvider} from './src/context/user.context';
 
-import React, {useState} from 'react';
-import {Alert, Button, StyleSheet, Text, View} from 'react-native';
-import Auth0 from 'react-native-auth0';
+import {Login} from './src/screens';
+import Navigation from './src/navigations/tabs.navigation';
 
-const credentials = require('./auth0-configuration');
-const auth0 = new Auth0(credentials);
+const Stack = createNativeStackNavigator();
 
-const App = () => {
-  let [accessToken, setAccessToken] = useState(null);
-
-  const onLogin = () => {
-    auth0.webAuth
-      .authorize({
-        scope: 'openid profile email',
-      })
-      .then(credentials => {
-        Alert.alert('AccessToken: ' + credentials.accessToken);
-        setAccessToken(credentials.accessToken);
-      })
-      .catch(error => console.log(error));
-  };
-
-  const onLogout = () => {
-    auth0.webAuth
-      .clearSession({})
-      .then(success => {
-        Alert.alert('Logged out!');
-        setAccessToken(null);
-      })
-      .catch(error => {
-        console.log('Log out cancelled');
-      });
-  };
-
-  let loggedIn = accessToken !== null;
-  return (
-    <View style={styles.container}>
-      <Text style={styles.header}> Auth0Sample - Login </Text>
-      <Text>You are{loggedIn ? ' ' : ' not '}logged in. </Text>
-      <Button
-        onPress={loggedIn ? onLogout : onLogin}
-        title={loggedIn ? 'Log Out' : 'Log In'}
-      />
-    </View>
-  );
+const HomeGeneral = () => {
+  return <Navigation />;
 };
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#F5FCFF',
-  },
-  header: {
-    fontSize: 20,
-    textAlign: 'center',
-    margin: 10,
-  },
-});
+const App = () => {
+  return (
+    <UserContextProvider>
+      <NavigationContainer>
+        <Stack.Navigator
+          screenOptions={{
+            headerShown: false,
+          }}>
+          <Stack.Screen
+            options={{header: () => null}}
+            name="Login"
+            component={Login}
+          />
+          <Stack.Screen
+            name="Home"
+            component={HomeGeneral}
+            options={{header: () => null}}
+          />
+          {/* <Stack.Screen name="Profile" /> */}
+        </Stack.Navigator>
+      </NavigationContainer>
+    </UserContextProvider>
+  );
+};
 
 export default App;
