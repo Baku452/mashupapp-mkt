@@ -1,4 +1,8 @@
+/* eslint-disable react-native/no-inline-styles */
 import React, {useContext, useState, useEffect} from 'react';
+import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+
 import {
   StyleSheet,
   Text,
@@ -6,42 +10,58 @@ import {
   ScrollView,
   Image,
   ActivityIndicator,
+  Pressable,
 } from 'react-native';
 import UserContext from '../context/user.context';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import {DEV_BACKEND_URL} from '@env';
 import axios from 'axios';
-import CardEvent from '../components/cardEvent';
 
 const CreateEvent = () => {
   const {val, token} = useContext(UserContext);
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(false);
-  console.log(DEV_BACKEND_URL + 'api/v1/events/');
-  const getEvents = async () => {
-    try {
-      setLoading(true);
-      const res = await axios(`${DEV_BACKEND_URL}api/v1/events/`);
-      setEvents(res.data);
-      setLoading(false);
-    } catch (e) {
-      console.log(e);
-    }
-  };
-  useEffect(() => {
-    getEvents();
-  }, []);
 
+  const handleCameraUpload = async () => {
+    const options = {
+      title: 'Select an image',
+      storageOptions: {
+        skipBackup: true,
+        path: 'images',
+      },
+    };
+    const result = await launchCamera();
+    console.log(result.uri);
+  };
+
+  const handleImageUpload = async () => {
+    const options = {
+      title: 'Select an image',
+      storageOptions: {
+        skipBackup: true,
+        path: 'images',
+      },
+    };
+    const result = await launchImageLibrary();
+    console.log(result);
+  };
   return (
-    <ScrollView>
-      {loading ? (
-        <ActivityIndicator size="large" />
-      ) : events.length > 0 ? (
-        events.map(item => <CardEvent eventData={item} />)
-      ) : (
-        <Text>No Results</Text>
-      )}
-    </ScrollView>
+    <View
+      style={{
+        margin: 'auto',
+        alignItems: 'center',
+        justifyContent: 'center',
+        width: '100%',
+        padding: 80,
+      }}>
+      <Pressable onPress={handleImageUpload}>
+        <MaterialCommunityIcons name="image" color={'#000'} size={50} />
+        <Text>Upload a Image</Text>
+      </Pressable>
+      <Pressable onPress={handleCameraUpload}>
+        <MaterialCommunityIcons name="camera" color={'#000'} size={50} />
+        <Text>Upload a Image</Text>
+      </Pressable>
+    </View>
   );
 };
 
@@ -51,11 +71,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: '#000',
-  },
-  header: {
-    fontSize: 20,
-    textAlign: 'center',
-    margin: 10,
   },
 });
 

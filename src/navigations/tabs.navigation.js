@@ -1,5 +1,5 @@
 import React from 'react';
-import {TouchableOpacity, View} from 'react-native';
+import {TouchableOpacity, View, StyleSheet} from 'react-native';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import {
@@ -13,23 +13,8 @@ import {
 const Tab = createBottomTabNavigator();
 
 const CustomTabBarButton = ({children, onPress}) => (
-  <TouchableOpacity
-    style={{
-      top: -30,
-      justifyContent: 'center',
-      alignItems: 'center',
-      // ...styles.shadow,
-    }}
-    onPress={onPress}>
-    <View
-      style={{
-        width: 70,
-        height: 70,
-        borderRadious: 35,
-        backgroundColor: '#e32f45',
-      }}>
-      {children}
-    </View>
+  <TouchableOpacity style={styles.containerButton} onPress={onPress}>
+    <View style={styles.containerButton__shape}>{children}</View>
   </TouchableOpacity>
 );
 
@@ -38,7 +23,12 @@ const Navigation = () => {
     <Tab.Navigator
       initialRouteName="Feed"
       screenOptions={{
-        tabBarActiveTintColor: '#e91e63',
+        tabBarActiveTintColor: '#7f5af0',
+        tabBarShowLabel: false,
+        headerStyle: {backgroundColor: 'black'},
+        headerTitleStyle: {
+          color: 'white',
+        },
       }}>
       <Tab.Screen
         name="Upcoming Events"
@@ -56,16 +46,22 @@ const Navigation = () => {
         options={{
           tabBarLabel: 'Updates',
           tabBarIcon: ({color, size}) => (
-            <MaterialCommunityIcons name="bell" color={color} size={size} />
+            <MaterialCommunityIcons name="calendar" color={color} size={size} />
           ),
         }}
       />
       <Tab.Screen
         name="Event"
         component={CreateEvent}
+        tabBarOptions={{
+          showLabel: false,
+        }}
         options={{
-          tabBarIcon: ({color, size, focused}) => (
-            <MaterialCommunityIcons name="circle" color={color} size={size} />
+          tabBarShowLabel: false,
+          showLabel: false,
+          labeled: false,
+          tabBarIcon: ({size, focused}) => (
+            <MaterialCommunityIcons name="plus" color={'#fff'} size={size} />
           ),
           tabBarButton: props => <CustomTabBarButton {...props} />,
         }}
@@ -93,5 +89,21 @@ const Navigation = () => {
     </Tab.Navigator>
   );
 };
+
+const styles = StyleSheet.create({
+  containerButton: {
+    top: -30,
+    shadowColor: '#171717',
+  },
+  containerButton__shape: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    width: 50,
+    height: 50,
+    margin: 0,
+    borderRadius: 35,
+    backgroundColor: '#7f5af0',
+  },
+});
 
 export default Navigation;

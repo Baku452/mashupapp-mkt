@@ -1,23 +1,26 @@
-import React, {useContext, useState, useEffect} from 'react';
+import React, {useState, useEffect} from 'react';
 import {
-  StyleSheet,
   Text,
-  View,
   ScrollView,
-  Image,
+  RefreshControl,
   ActivityIndicator,
 } from 'react-native';
-import UserContext from '../context/user.context';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import {DEV_BACKEND_URL} from '@env';
 import axios from 'axios';
 import CardEvent from '../components/cardEvent';
 
+const wait = timeout => {
+  return new Promise(resolve => setTimeout(resolve, timeout));
+};
+
 const Feed = () => {
-  const {val, token} = useContext(UserContext);
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(false);
-  console.log(DEV_BACKEND_URL + 'api/v1/events/');
+  const [refreshing, setRefreshing] = useState(false);
+  const onRefresh = React.useCallback(() => {
+    setRefreshing(true);
+    wait(2000).then(() => setRefreshing(false));
+  }, []);
   const getEvents = async () => {
     try {
       setLoading(true);
@@ -33,7 +36,10 @@ const Feed = () => {
   }, []);
 
   return (
-    <ScrollView>
+    <ScrollView
+      refreshControl={
+        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+      }>
       {loading ? (
         <ActivityIndicator size="large" />
       ) : events.length > 0 ? (
@@ -44,19 +50,5 @@ const Feed = () => {
     </ScrollView>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#000',
-  },
-  header: {
-    fontSize: 20,
-    textAlign: 'center',
-    margin: 10,
-  },
-});
 
 export {Feed};

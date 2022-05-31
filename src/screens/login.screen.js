@@ -1,54 +1,35 @@
-import React, {useState} from 'react';
-import {Alert, ImageBackground, Button, StyleSheet, Text} from 'react-native';
+import React, {useContext} from 'react';
+import {ImageBackground, Button, StyleSheet, View, Text} from 'react-native';
 import Auth0 from 'react-native-auth0';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import UserContext from '../context/user.context';
 
 const credentials = require('../../auth0-configuration');
 const auth0 = new Auth0(credentials);
 const {BGAPP} = require('../../img/index');
 
 const Login = ({navigation}) => {
-  let [accessToken, setAccessToken] = useState(null);
-
+  const {setToken} = useContext(UserContext);
   const onLogin = () => {
     auth0.webAuth
       .authorize({
         scope: 'openid profile email',
       })
       .then(resCredentials => {
-        // Alert.alert('AccessToken: ' + credentials);
-        setAccessToken(resCredentials.accessToken);
         getUserInfo(resCredentials.accessToken);
-        navigation.navigate('Home');
       })
       .catch(error => console.log(error));
   };
 
-  const onLogout = () => {
-    auth0.webAuth
-      .clearSession({})
-      .then(success => {
-        Alert.alert('Logged out!');
-        setAccessToken(null);
-      })
-      .catch(error => {
-        console.log('Log out cancelled');
-      });
-  };
-
   const getUserInfo = async tokenUser => {
     if (tokenUser !== null) {
-      try {
-        await AsyncStorage.setItem('@token', tokenUser);
-      } catch (e) {
-        console.log(e);
-      }
+      setToken(tokenUser);
       auth0.auth
         .userInfo({token: tokenUser})
         .then(async info => {
-          const [, idUser] = info.sub.split('|');
           try {
-            await AsyncStorage.setItem('@userID', idUser);
+            await AsyncStorage.setItem('@userID', info.sub);
+            await AsyncStorage.setItem('userInfo', JSON.stringify(info));
           } catch (e) {
             console.log(e);
           }
@@ -58,15 +39,18 @@ const Login = ({navigation}) => {
         });
     }
   };
-  let loggedIn = accessToken !== null;
   return (
     <ImageBackground source={BGAPP} style={styles.container}>
-      <Text style={styles.header}> Mashup Login</Text>
-      <Text>You are{loggedIn ? ' ' : ' not '}logged in. </Text>
-      <Button
-        onPress={loggedIn ? onLogout : onLogin}
-        title={loggedIn ? 'Log Out' : 'Log In'}
-      />
+      <Text style={styles.header}> Mashup APP</Text>
+
+      <View style={styles.btnLogin}>
+        <Button
+          color="#7f5af0"
+          style={styles.btnLogin}
+          onPress={onLogin}
+          title={'Log In'}
+        />
+      </View>
     </ImageBackground>
   );
 };
@@ -81,8 +65,16 @@ const styles = StyleSheet.create({
   header: {
     color: '#fff',
     fontSize: 20,
+    fontWeight: 'bold',
     textAlign: 'center',
     margin: 10,
+    textTransform: 'uppercase',
+  },
+  text: {
+    color: '#fff',
+  },
+  btnLogin: {
+    marginTop: 50,
   },
 });
 
