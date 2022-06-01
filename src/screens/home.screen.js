@@ -17,10 +17,12 @@ const Feed = () => {
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
+
   const onRefresh = React.useCallback(() => {
     setRefreshing(true);
-    wait(2000).then(() => setRefreshing(false));
+    getEvents().then(() => setRefreshing(false));
   }, []);
+
   const getEvents = async () => {
     try {
       setLoading(true);

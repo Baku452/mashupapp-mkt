@@ -32,17 +32,7 @@ const CustomSearch = () => {
     getEvents();
   }, []);
 
-  return (
-    <ScrollView>
-      {loading ? (
-        <ActivityIndicator size="large" />
-      ) : events.length > 0 ? (
-        events.map(item => <CardEvent eventData={item} />)
-      ) : (
-        <Text>No Results</Text>
-      )}
-    </ScrollView>
-  );
+  return <Text>Coming Soon</Text>;
 };
 
 const styles = StyleSheet.create({

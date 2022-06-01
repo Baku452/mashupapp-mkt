@@ -41,7 +41,7 @@ const Navigation = () => {
         }}
       />
       <Tab.Screen
-        name="Events"
+        name="My Events"
         component={MyEvents}
         options={{
           tabBarLabel: 'Updates',
@@ -77,10 +77,10 @@ const Navigation = () => {
         }}
       />
       <Tab.Screen
-        name="Profile"
+        name="My Account"
         component={Profile}
         options={{
-          tabBarLabel: 'Profile',
+          tabBarLabel: 'My Account',
           tabBarIcon: ({color, size}) => (
             <MaterialCommunityIcons name="account" color={color} size={size} />
           ),

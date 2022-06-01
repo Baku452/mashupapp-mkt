@@ -28,7 +28,6 @@ export function UserContextProvider({children}) {
     AsyncStorage.getItem('@token')
       .then(value => {
         if (value) {
-          console.log(value);
           setToken(value);
         }
       })

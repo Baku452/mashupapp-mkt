@@ -1,4 +1,4 @@
-import React, {useContext} from 'react';
+import React, {useContext, useState} from 'react';
 import {View, Text, Image, StyleSheet, TouchableOpacity} from 'react-native';
 import axios from 'axios';
 import {DEV_BACKEND_URL} from '@env';
@@ -43,6 +43,13 @@ const styles = StyleSheet.create({
     maxWidth: '50%',
     alignSelf: 'center',
   },
+  buttonLeave: {
+    backgroundColor: '#dd3030',
+    borderRadius: 25,
+    fontWeight: 'bold',
+    maxWidth: '50%',
+    alignSelf: 'center',
+  },
   button__title: {
     padding: 10,
     paddingHorizontal: 30,
@@ -52,7 +59,7 @@ const styles = StyleSheet.create({
 
 const CardEvent = ({eventData}) => {
   const {userID} = useContext(UserContext);
-  console.log(userID);
+  const [join, setJoin] = useState(eventData.attendees.indexOf(userID));
   const subscribeToEvent = async idEvent => {
     try {
       const eventUpdated = await axios.put(
@@ -62,9 +69,19 @@ const CardEvent = ({eventData}) => {
       console.log(error);
     }
   };
-
+  const unsubscribeToEvent = async idEvent => {
+    try {
+      const eventUpdated = await axios.put(
+        `${DEV_BACKEND_URL}api/v1/events/${idEvent}/removeAttende?userId=${userID}`,
+      );
+    } catch (error) {
+      console.log(error);
+    }
+  };
   const buttonClickedHandler = () => {
-    subscribeToEvent(eventData._id);
+    join > -1
+      ? unsubscribeToEvent(eventData._id)
+      : subscribeToEvent(eventData._id);
   };
 
   return (
@@ -80,8 +97,12 @@ const CardEvent = ({eventData}) => {
           </Text>
           <Text style={styles.textWhite}>{eventData.artistGenre}</Text>
         </View>
-        <TouchableOpacity onPress={buttonClickedHandler} style={styles.button}>
-          <Text style={[styles.button__title]}>Join Us</Text>
+        <TouchableOpacity
+          onPress={buttonClickedHandler}
+          style={join > -1 ? styles.buttonLeave : styles.button}>
+          <Text style={styles.button__title}>
+            {join > -1 ? 'Leave' : 'Join us'}
+          </Text>
         </TouchableOpacity>
       </View>
     </View>

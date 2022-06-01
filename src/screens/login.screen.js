@@ -13,7 +13,8 @@ const Login = ({navigation}) => {
   const onLogin = () => {
     auth0.webAuth
       .authorize({
-        scope: 'openid profile email',
+        scope: 'openid profile email read:current_user',
+        audience: 'https://dev-r3pcavyk.us.auth0.com/api/v2/',
       })
       .then(resCredentials => {
         getUserInfo(resCredentials.accessToken);
